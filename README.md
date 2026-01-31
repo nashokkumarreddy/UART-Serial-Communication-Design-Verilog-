@@ -1,62 +1,86 @@
-# UART Serial Communication Design (Verilog)
+# 📡 UART Serial Communication Module (Verilog)
 
-## 📌 Project Overview
-This project is a fully functional implementation of a **Universal Asynchronous Receiver-Transmitter (UART)** designed in Verilog HDL. It enables serial communication between an FPGA and external devices (like a laptop or sensor).
+![Language](https://img.shields.io/badge/language-Verilog-blue)
+![Tools](https://img.shields.io/badge/tools-ModelSim%20%7C%20Vivado%20%7C%20Quartus-orange)
+![Status](https://img.shields.io/badge/status-Verified-brightgreen)
 
-The design includes a custom **Baud Rate Generator**, a **Transmitter (Tx)**, and a **Receiver (Rx)** with oversampling logic for robust data recovery. The project has been verified via simulation in **ModelSim** and is ready for synthesis on Xilinx/Intel FPGAs.
+## 📖 Overview
+This repository contains a synthesizable **Universal Asynchronous Receiver-Transmitter (UART)** designed in Verilog HDL. The project implements a robust serial communication interface capable of full-duplex data transmission between an FPGA and external devices (PC, Sensors, Microcontrollers).
+
+The design follows a modular approach with a dedicated **Baud Rate Generator**, **Transmitter (Tx)**, and **Receiver (Rx)** with 16x oversampling for noise immunity.
+
+## 🛠️ Features
+* **Configurable Baud Rate:** Parameterized clock divider to support standard baud rates (9600, 115200, etc.).
+* **Robust Receiver:** Uses **16x oversampling** to detect the center of data bits, ensuring accurate data recovery.
+* **Finite State Machine (FSM):** Efficient and clean state machine implementation for both Tx and Rx modules.
+* **Simulation Ready:** Includes a self-checking testbench verified in **ModelSim**.
 
 ## 📂 File Structure
-| File Name | Description |
+
+| File Name | Function |
 | :--- | :--- |
-| `baud_rate_gen.v` | Generates the "tick" pulse for synchronization. Uses 16x oversampling. |
-| `uart_tx.v` | The Transmitter module (Parallel-to-Serial converter). |
-| `uart_rx.v` | The Receiver module (Serial-to-Parallel converter). |
-| `uart_tb.v` | The Testbench for ModelSim (Loopback test: Tx → Rx). |
-| `uart_top.v` | Top-level wrapper for FPGA implementation (Echo System). |
+| `baud_rate_gen.v` | **Clock Divider:** Generates the "tick" pulse for synchronization. |
+| `uart_tx.v` | **Transmitter:** Converts parallel data bytes into serial bitstreams. |
+| `uart_rx.v` | **Receiver:** Detects start bits and converts serial streams to parallel bytes. |
+| `uart_top.v` | **Top Module:** Implements a "Loopback/Echo" system for hardware testing. |
+| `uart_tb.v` | **Testbench:** Simulation file to verify logic (Loopback test). |
 
-## ⚙️ Key Features
-* **Language:** Verilog (IEEE 1364-2005)
-* **Data Frame:** 1 Start bit, 8 Data bits, 1 Stop bit, No Parity.
-* **Oversampling:** 16x oversampling in the Receiver for noise immunity.
-* **Configurable Baud Rate:** The divisor is parameterized for easy adjustment to any system clock.
+---
 
-## 🚀 How to Run Simulation (ModelSim)
-1.  Open **ModelSim**.
-2.  Create a new project and add `baud_rate_gen.v`, `uart_tx.v`, `uart_rx.v`, and `uart_tb.v`.
-3.  **Compile All** files.
-4.  Start Simulation on the library `work.uart_tb`.
-5.  Add signals to the **Wave** window (`clk`, `rst`, `data_in`, `data_out`, `tx_line`).
-6.  Run the simulation (`run -all`).
-7.  **Verify:** Check the Transcript window for "SUCCESS" messages or view the Waveform to see `data_in` matching `data_out`.
+## 💻 How to Run Simulation (ModelSim)
 
-## 🛠️ Hardware Implementation (FPGA)
-To run this on a physical board (e.g., Basys 3, Arty A7, DE10-Lite):
-
-1.  **Calculate the Divisor:**
-    Update the `DIVISOR` parameter in `baud_rate_gen.v` using this formula:
+1.  **Clone the repository:**
+    ```bash
+    git clone [https://github.com/YourUsername/verilog-uart-design.git](https://github.com/YourUsername/verilog-uart-design.git)
     ```
-    Divisor = System_Clock_Freq / (Baud_Rate * 16)
+2.  Open **ModelSim** and create a new project.
+3.  Add all `.v` files to the project.
+4.  **Compile All** files.
+5.  Start simulation on `work.uart_tb`.
+6.  Add `data_in`, `data_out`, and `tx` signals to the **Wave** window.
+7.  Run the simulation:
+    ```tcl
+    run -all
     ```
-    *Example: For 100 MHz clock and 9600 baud -> 100,000,000 / (9600 * 16) = 651*
+8.  **Result:** You should see `data_out` matching `data_in` in the waveform.
 
-2.  **Synthesis:**
-    * Open **Xilinx Vivado** or **Intel Quartus**.
-    * Add all design files (excluding the testbench).
-    * Set `uart_top.v` as the Top Module.
-    * Assign pins (Constraints) for `clk`, `rst`, `RsRx`, and `RsTx`.
+### 📸 Simulation Result
+*(Place your screenshot from ModelSim here. Example: `![Waveform](images/waveform.png)`)*
 
-3.  **Testing:**
-    * Flash the FPGA.
-    * Open **Tera Term** or **PuTTY** on your PC.
-    * Set Baud Rate to 9600.
-    * Type characters; if the "Echo" system works, they will appear on the terminal.
+---
 
-## 📊 Future Improvements
-* Add a FIFO (First-In-First-Out) buffer to handle high-speed data bursts.
-* Implement Parity Bit logic (Odd/Even) for error checking.
-* Add interrupt capability for embedded processor integration.
+## ⚙️ Hardware Implementation (FPGA)
 
-## 📝 Author
-* **N ASHOK KUMAR REDDY ** - *Initial Work*
-* Electronics and Communication Engineering (ECE) Student# uart-serial-communication-fpga
-Full duplex UART implementation in Verilog features a custom baud rate generator, 16x oversampling receiver, and loopback verification. Ready for Xilinx/Intel FPGAs.
+To deploy this on a physical board (e.g., Basys 3, Arty A7, DE10-Lite):
+
+### 1. Calculate the Divisor
+Before synthesis, update the `DIVISOR` parameter in `baud_rate_gen.v` to match your board's clock.
+
+$$ \text{Divisor} = \frac{\text{System Clock Frequency}}{\text{Baud Rate} \times 16} $$
+
+| Board Clock | Target Baud | Divisor Value |
+| :--- | :--- | :--- |
+| 50 MHz | 9600 | **325** |
+| 100 MHz | 9600 | **651** |
+
+### 2. Pin Constraints
+Map the following ports in your `.xdc` (Xilinx) or `.qsf` (Intel) file:
+* `clk` → System Clock
+* `rst` → Push Button
+* `RsRx` → USB-UART RX Pin
+* `RsTx` → USB-UART TX Pin
+
+### 3. Verify
+Open a Serial Terminal (Tera Term / PuTTY) with **9600 Baud, 8 Data bits, No Parity, 1 Stop bit**. Typing characters on the keyboard should "echo" them back to the screen.
+
+---
+
+## 📝 Future Improvements
+* [ ] Implement Parity Bit (Odd/Even) logic.
+* [ ] Add FIFO buffers for high-speed buffering.
+* [ ] Create an AXI4-Lite wrapper for processor integration.
+
+## 👤 Author
+**[Your Name]**
+* ECE Student | VLSI Enthusiast
+* [LinkedIn Profile Link]
