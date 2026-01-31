@@ -84,6 +84,5 @@ Open a Serial Terminal (Tera Term / PuTTY) with **9600 Baud, 8 Data bits, No Par
 * [ ] Create an AXI4-Lite wrapper for processor integration.
 
 ## 👤 Author
-**[Your Name]**
+N ASHOK KUMAR REDDY
 * ECE Student | VLSI Enthusiast
-* [LinkedIn Profile Link]
